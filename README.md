@@ -41,6 +41,8 @@ Choose from 11 distinct, professionally designed templates:
 
 2.  **Create a Virtual Environment**
     ```bash
+    python -m venv env
+    .\env\Scripts\activate #for windows
     python3 -m venv env
     source env/bin/activate
     ```
