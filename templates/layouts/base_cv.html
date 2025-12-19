@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.personal_detail.full_name }} | {{ resume.get_doc_type_display }}</title>
+    <style>
+        /* Base Variables - To be overridden by templates */
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --accent: #3498db;
+            --bg-body: #ffffff;
+            --bg-sidebar: #f5f5f5;
+            --text-main: #333333;
+            --text-sidebar: #555555;
+            --font-main: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            --font-headings: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        body { font-family: var(--font-main); background: #eee; margin: 0; padding: 20px 0; color: var(--text-main); }
+        .resume-container { background: var(--bg-body); width: 210mm; min-height: 297mm; margin: 0 auto; display: flex; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        
+        .sidebar { width: 32%; background: var(--bg-sidebar); color: var(--text-sidebar); padding: 30px; box-sizing: border-box; }
+        .main-content { width: 68%; padding: 40px; box-sizing: border-box; }
+        
+        h1 { font-family: var(--font-headings); margin: 0 0 10px 0; line-height: 1.2; color: var(--primary); }
+        h2 { font-family: var(--font-headings); color: var(--secondary); border-bottom: 2px solid var(--accent); padding-bottom: 5px; margin: 30px 0 15px 0; font-size: 18px; text-transform: uppercase; }
+        
+        .contact-item { margin-bottom: 8px; font-size: 13px; word-wrap: break-word; }
+        .profile-img { width: 150px; height: 150px; object-fit: cover; border-radius: 50%; margin-bottom: 20px; border: 4px solid var(--accent); }
+        
+        .item { margin-bottom: 20px; }
+        .item-title { font-weight: bold; font-size: 16px; color: var(--primary); }
+        .item-subtitle { font-style: italic; color: #666; font-size: 14px; margin-bottom: 5px; }
+        .item-desc { font-size: 14px; line-height: 1.5; text-align: justify; }
+        
+        .skill-tag { display: inline-block; background: var(--secondary); color: white; padding: 3px 8px; margin: 2px; border-radius: 3px; font-size: 12px; }
+        
+        @media print {
+            body { padding: 0; background: white; }
+            .resume-container { width: 100%; box-shadow: none; margin: 0; }
+            .sidebar { background: var(--bg-sidebar) !important; -webkit-print-color-adjust: exact; }
+            h2 { border-bottom-color: var(--accent) !important; -webkit-print-color-adjust: exact; }
+        }
+
+        /* Template Specific Overrides */
+        {% block css %}{% endblock %}
+    </style>
+    <!-- Fonts Block -->
+    {% block fonts %}{% endblock %}
+</head>
+<body>
+
+<div class="resume-container">
+    {% block layout %}
+    <!-- Default Layout: Sidebar Left -->
+    <div class="sidebar">
+        {% if resume.personal_detail.image %}
+        <img src="{{ resume.personal_detail.image.url }}" class="profile-img">
+        {% endif %}
+        
+        {% block sidebar_content %}
+        <h2 style="margin-top: 0;">Contact</h2>
+        <div class="contact-item">{{ resume.personal_detail.email }}</div>
+        <div class="contact-item">{{ resume.personal_detail.phone }}</div>
+        <div class="contact-item">{{ resume.personal_detail.address }}</div>
+        {% if resume.personal_detail.linkedin_url %}
+        <div class="contact-item"><a href="{{ resume.personal_detail.linkedin_url }}" style="color: inherit;">LinkedIn</a></div>
+        {% endif %}
+        {% if resume.personal_detail.portfolio_url %}
+        <div class="contact-item"><a href="{{ resume.personal_detail.portfolio_url }}" style="color: inherit;">Portfolio</a></div>
+        {% endif %}
+        
+        <h2>Skills</h2>
+        <div>
+            {% for skill in resume.skills.all %}
+            <span class="skill-tag">{{ skill.name }}</span>
+            {% endfor %}
+        </div>
+        {% endblock %}
+    </div>
+    
+    <div class="main-content">
+        <h1>{{ resume.personal_detail.full_name }}</h1>
+        {% if resume.personal_detail.summary %}
+        <p style="margin-bottom: 30px;">{{ resume.personal_detail.summary }}</p>
+        {% endif %}
+        
+        {% block main_content %}
+        <h2>Experience</h2>
+        {% for exp in resume.experience.all %}
+        <div class="item">
+            <div class="item-title">{{ exp.position }}</div>
+            <div class="item-subtitle">{{ exp.company }} | {{ exp.start_date }} - {% if exp.is_current %}Present{% else %}{{ exp.end_date }}{% endif %}</div>
+            <div class="item-desc">{{ exp.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        
+        <h2>Education</h2>
+        {% for edu in resume.education.all %}
+        <div class="item">
+            <div class="item-title">{{ edu.degree }}</div>
+            <div class="item-subtitle">{{ edu.institution }} | {{ edu.start_date }} - {% if edu.is_current %}Present{% else %}{{ edu.end_date }}{% endif %}</div>
+            <div class="item-desc">{{ edu.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+
+        {% if resume.research.all %}
+        <h2>Research</h2>
+        {% for res in resume.research.all %}
+        <div class="item">
+            <div class="item-title">{{ res.title }}</div>
+            <div class="item-subtitle">{{ res.date }}</div>
+            <div class="item-desc">{{ res.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if resume.publications.all %}
+        <h2>Publications</h2>
+        {% for pub in resume.publications.all %}
+        <div class="item">
+            <div class="item-title">{{ pub.title }}</div>
+            <div class="item-subtitle">{{ pub.publisher }} | {{ pub.date }}</div>
+             {% if pub.url %}<div class="item-desc"><a href="{{ pub.url }}">{{ pub.url }}</a></div>{% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if resume.awards.all %}
+        <h2>Awards</h2>
+        {% for award in resume.awards.all %}
+        <div class="item">
+            <div class="item-title">{{ award.title }}</div>
+            <div class="item-subtitle">{{ award.issuer }} | {{ award.date }}</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+        {% endblock %}
+    </div>
+    {% endblock %} <!-- End Layout -->
+</div>
+
+<script>
+    // Mobile Scaling Script
+    function scanResume() {
+        if (window.matchMedia('print').matches) return;
+        
+        const container = document.querySelector('.resume-container');
+        if (!container) return;
+        
+        const screenWidth = window.innerWidth;
+        const containerWidth = 794; // 210mm approx in pixels at 96dpi
+        
+        if (screenWidth < containerWidth + 40) {
+            const scale = (screenWidth - 40) / containerWidth;
+            container.style.transform = `scale(${scale})`;
+            container.style.transformOrigin = 'top left';
+            // Adjust body height to account for scaling
+            const scaledHeight = container.offsetHeight * scale;
+            document.body.style.height = `${scaledHeight + 40}px`;
+            // Center if needed
+            if (screenWidth > 500) {
+                 container.style.marginLeft = '20px'; // some padding
+            }
+        } else {
+            container.style.transform = 'none';
+            document.body.style.height = 'auto';
+            container.style.margin = '0 auto';
+        }
+    }
+    
+    window.addEventListener('resize', scanResume);
+    window.addEventListener('load', scanResume);
+</script>
+</body>
+</html>

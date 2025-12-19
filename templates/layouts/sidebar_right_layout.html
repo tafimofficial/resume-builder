@@ -1,0 +1,84 @@
+{% extends "layouts/base_cv.html" %}
+
+{% block layout %}
+    <div class="main-content" style="width: 65%;">
+        <h1>{{ resume.personal_detail.full_name }}</h1>
+        {% if resume.personal_detail.summary %}
+        <p style="margin-bottom: 30px;">{{ resume.personal_detail.summary }}</p>
+        {% endif %}
+        
+        {{ block.super }} 
+        <!-- This pulls the default main_content (Experience, Edu, etc) but suppresses h1/summary since we manually placed them -->
+        <!-- Wait, block.super in main_content would duplicate h1. We need to be careful. -->
+        <!-- Logic: base_cv defines main_content INSIDE .main-content div. -->
+        <!-- We are overriding the whole LAYOUT block. -->
+        
+        <!-- Re-implement main content loop purely -->
+        <h2>Experience</h2>
+        {% for exp in resume.experience.all %}
+        <div class="item">
+            <div class="item-title">{{ exp.position }}</div>
+            <div class="item-subtitle">{{ exp.company }} | {{ exp.start_date }} - {% if exp.is_current %}Present{% else %}{{ exp.end_date }}{% endif %}</div>
+            <div class="item-desc">{{ exp.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        
+        <h2>Education</h2>
+        {% for edu in resume.education.all %}
+        <div class="item">
+            <div class="item-title">{{ edu.degree }}</div>
+            <div class="item-subtitle">{{ edu.institution }} | {{ edu.start_date }} - {% if edu.is_current %}Present{% else %}{{ edu.end_date }}{% endif %}</div>
+            <div class="item-desc">{{ edu.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+
+        <!-- Check for CV Sections -->
+        {% if resume.research.all %}
+        <h2>Research</h2>
+        {% for res in resume.research.all %}
+        <div class="item">
+            <div class="item-title">{{ res.title }}</div>
+            <div class="item-desc">{{ res.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+         {% if resume.publications.all %}
+        <h2>Publications</h2>
+        {% for pub in resume.publications.all %}
+        <div class="item">
+            <div class="item-title">{{ pub.title }}</div>
+            <div class="item-subtitle">{{ pub.publisher }}</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+        
+         {% if resume.awards.all %}
+        <h2>Awards</h2>
+        {% for award in resume.awards.all %}
+        <div class="item">
+            <div class="item-title">{{ award.title }}</div>
+            <div class="item-subtitle">{{ award.issuer }}</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+
+    <div class="sidebar" style="width: 35%;">
+        {% if resume.personal_detail.image %}
+        <img src="{{ resume.personal_detail.image.url }}" class="profile-img">
+        {% endif %}
+        
+        <h2 style="margin-top: 0;">Contact</h2>
+        <div class="contact-item">{{ resume.personal_detail.email }}</div>
+        <div class="contact-item">{{ resume.personal_detail.phone }}</div>
+        <div class="contact-item">{{ resume.personal_detail.address }}</div>
+        
+        <h2>Skills</h2>
+        <div>
+            {% for skill in resume.skills.all %}
+            <span class="skill-tag">{{ skill.name }}</span>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

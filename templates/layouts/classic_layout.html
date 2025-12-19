@@ -1,0 +1,53 @@
+{% extends "layouts/base_cv.html" %}
+
+{% block layout %}
+<style>
+    .resume-container { display: block; padding: 60px; }
+    .sidebar { width: 100%; background: none; padding: 0; margin-bottom: 20px; border-bottom: 1px solid #ccc; padding-bottom: 20px; text-align: center; }
+    .main-content { width: 100%; padding: 0; }
+    .profile-img { width: 120px; height: 120px; margin: 0 auto 15px auto; display: block; }
+    
+    /* Override Sidebar Content for Header Layout */
+    .sidebar h2 { display: none; }
+    .contact-item { display: inline-block; margin: 0 10px; }
+    .skill-tag { background: #eee; color: #333; border: 1px solid #ccc; }
+    
+    h1 { text-align: center; }
+</style>
+
+<div class="sidebar">
+    {% if resume.personal_detail.image %}
+    <img src="{{ resume.personal_detail.image.url }}" class="profile-img">
+    {% endif %}
+    <h1>{{ resume.personal_detail.full_name }}</h1>
+    
+    <div>
+        <span class="contact-item">{{ resume.personal_detail.email }}</span>
+        <span class="contact-item">{{ resume.personal_detail.phone }}</span>
+        <span class="contact-item">{{ resume.personal_detail.address }}</span>
+        {% if resume.personal_detail.linkedin_url %}
+        <span class="contact-item"><a href="{{ resume.personal_detail.linkedin_url }}">LinkedIn</a></span>
+        {% endif %}
+        {% if resume.personal_detail.portfolio_url %}
+        <span class="contact-item"><a href="{{ resume.personal_detail.portfolio_url }}">Portfolio</a></span>
+        {% endif %}
+    </div>
+    
+    {% if resume.personal_detail.summary %}
+    <p style="margin-top: 15px; max-width: 80%; margin-left: auto; margin-right: auto;">{{ resume.personal_detail.summary }}</p>
+    {% endif %}
+</div>
+
+<div class="main-content">
+    {% block main_content %}
+    {{ block.super }}
+    
+    <h2>Skills</h2>
+    <div>
+        {% for skill in resume.skills.all %}
+        <span class="skill-tag">{{ skill.name }}</span>
+        {% endfor %}
+    </div>
+    {% endblock %}
+</div>
+{% endblock %}

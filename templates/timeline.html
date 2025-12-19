@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.personal_detail.full_name }} | {{ resume.get_doc_type_display }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+        
+        body { font-family: 'Poppins', sans-serif; background: #222; color: #fff; margin: 0; padding: 40px 0; }
+        .resume-container { background: #333; width: 210mm; min-height: 297mm; margin: 0 auto; padding: 0; display: flex; box-shadow: 0 0 30px rgba(0,0,0,0.5); }
+        
+        .sidebar { width: 300px; background: #444; padding: 40px; text-align: center; }
+        .main-content { flex: 1; padding: 40px; }
+        
+        .profile-img { width: 160px; height: 160px; border-radius: 50%; border: 5px solid #555; margin-bottom: 30px; object-fit: cover; }
+        
+        .name { font-size: 28px; font-weight: 600; margin-bottom: 10px; color: #fff; }
+        .contact-info { font-size: 14px; color: #aaa; margin-bottom: 30px; line-height: 1.8; }
+        .contact-info a { color: #4dabf7; text-decoration: none; }
+        
+        .section-title { font-size: 20px; text-transform: uppercase; color: #4dabf7; margin-bottom: 30px; padding-bottom: 10px; border-bottom: 1px solid #555; letter-spacing: 2px; }
+        
+        .timeline { position: relative; padding-left: 20px; border-left: 2px solid #555; }
+        .timeline-item { position: relative; margin-bottom: 40px; }
+        .timeline-item::before { content: ''; position: absolute; left: -27px; top: 0; width: 12px; height: 12px; background: #4dabf7; border-radius: 50%; border: 2px solid #333; }
+        
+        .t-date { font-size: 13px; color: #4dabf7; font-weight: 600; margin-bottom: 5px; text-transform: uppercase; }
+        .t-title { font-size: 18px; font-weight: 600; margin-bottom: 5px; }
+        .t-subtitle { font-size: 15px; color: #ccc; font-style: italic; margin-bottom: 10px; }
+        .t-desc { font-size: 14px; color: #bbb; line-height: 1.6; }
+        
+        .skills-list { text-align: left; }
+        .skill-item { margin-bottom: 15px; }
+        .skill-header { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; }
+        .skill-bar-bg { background: #555; height: 6px; border-radius: 3px; }
+        .skill-bar-fill { background: #4dabf7; height: 100%; border-radius: 3px; }
+
+        @media print {
+            body { padding: 0; background: #fff; color: #000; }
+            .resume-container { box-shadow: none; width: 100%; margin: 0; background: #fff; display: block; }
+            .sidebar { width: 100%; background: #eee; padding: 20px; color: #000; display: flex; align-items: center; gap: 20px; text-align: left; box-sizing: border-box; }
+            .profile-img { width: 100px; height: 100px; margin: 0; border-color: #ccc; }
+            .name { color: #000; }
+            .contact-info { color: #333; margin: 0; }
+            .main-content { padding: 40px; color: #000; }
+            .section-title { color: #000; border-color: #ccc; }
+            .timeline { border-color: #ccc; }
+            .timeline-item::before { background: #000; border-color: #fff; }
+            .t-date { color: #000; }
+            .t-subtitle { color: #555; }
+            .t-desc { color: #333; }
+            .skill-bar-bg { background: #ddd; }
+            .skill-bar-fill { background: #000; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="resume-container">
+    <div class="sidebar">
+        {% if resume.personal_detail.image %}
+            <img src="{{ resume.personal_detail.image.url }}" class="profile-img">
+        {% endif %}
+        
+        <div class="name">{{ resume.personal_detail.full_name }}</div>
+        
+        <div class="contact-info">
+            <div>{{ resume.personal_detail.email }}</div>
+            <div>{{ resume.personal_detail.phone }}</div>
+            <div style="margin-top: 10px;">{{ resume.personal_detail.address }}</div>
+            {% if resume.personal_detail.linkedin_url %}
+            <div style="margin-top: 15px;"><a href="{{ resume.personal_detail.linkedin_url }}">LinkedIn Profile</a></div>
+            {% endif %}
+            {% if resume.personal_detail.portfolio_url %}
+            <div><a href="{{ resume.personal_detail.portfolio_url }}">Portfolio</a></div>
+            {% endif %}
+        </div>
+        
+        <div class="section-title" style="font-size: 16px; margin-top: 40px;">Skills</div>
+        <div class="skills-list">
+            {% for skill in resume.skills.all %}
+            <div class="skill-item">
+                <div class="skill-header">
+                    <span>{{ skill.name }}</span>
+                    <span>{{ skill.proficiency }}%</span>
+                </div>
+                <div class="skill-bar-bg">
+                    <div class="skill-bar-fill" style="width: {{ skill.proficiency }}%;"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="main-content">
+        {% if resume.personal_detail.summary %}
+        <div class="section-title">About Me</div>
+        <div style="margin-bottom: 40px; line-height: 1.6; color: #bbb;">
+            {{ resume.personal_detail.summary }}
+        </div>
+        {% endif %}
+        
+        <div class="section-title">Experience</div>
+        <div class="timeline">
+            {% for exp in resume.experience.all %}
+            <div class="timeline-item">
+                <div class="t-date">{{ exp.start_date }} - {% if exp.is_current %}Present{% else %}{{ exp.end_date }}{% endif %}</div>
+                <div class="t-title">{{ exp.position }}</div>
+                <div class="t-subtitle">{{ exp.company }}</div>
+                <div class="t-desc">{{ exp.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="section-title">Education</div>
+        <div class="timeline">
+            {% for edu in resume.education.all %}
+            <div class="timeline-item">
+                <div class="t-date">{{ edu.start_date }} - {% if edu.is_current %}Present{% else %}{{ edu.end_date }}{% endif %}</div>
+                <div class="t-title">{{ edu.degree }}</div>
+                <div class="t-subtitle">{{ edu.institution }}</div>
+                <div class="t-desc">{{ edu.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if resume.research.all %}
+        <div class="section-title">Research</div>
+        <div class="timeline">
+            {% for res in resume.research.all %}
+            <div class="timeline-item">
+                <div class="t-date">{{ res.date }}</div>
+                <div class="t-title">{{ res.title }}</div>
+                <div class="t-desc">{{ res.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if resume.publications.all %}
+        <div class="section-title">Publications</div>
+        <div class="timeline">
+            {% for pub in resume.publications.all %}
+            <div class="timeline-item">
+                <div class="t-date">{{ pub.date }}</div>
+                <div class="t-title">{{ pub.title }}</div>
+                <div class="t-subtitle">{{ pub.publisher }}</div>
+                 {% if pub.url %}<div class="t-desc"><a href="{{ pub.url }}" style="color: #4dabf7;">{{ pub.url }}</a></div>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if resume.awards.all %}
+        <div class="section-title">Awards</div>
+        <div class="timeline">
+            {% for award in resume.awards.all %}
+            <div class="timeline-item">
+                <div class="t-date">{{ award.date }}</div>
+                <div class="t-title">{{ award.title }}</div>
+                <div class="t-subtitle">{{ award.issuer }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

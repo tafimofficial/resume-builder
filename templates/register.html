@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6 col-lg-4">
+        <div class="glass-card p-5 mt-5">
+            <h2 class="text-center mb-4">Register</h2>
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-primary text-white">Sign Up</button>
+                </div>
+            </form>
+            <p class="text-center mt-3">Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        </div>
+    </div>
+</div>
+{% endblock %}

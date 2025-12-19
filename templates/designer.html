@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.personal_detail.full_name }} | {{ resume.get_doc_type_display }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Raleway:wght@300;400;600;700&display=swap');
+        
+        body { font-family: 'Raleway', sans-serif; background: #e0e0e0; margin: 0; padding: 40px 0; }
+        .resume-container { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; display: flex; box-shadow: 10px 10px 0px #333; }
+        
+        .sidebar { width: 35%; background: #ffde59; color: #333; padding: 40px; display: flex; flex-direction: column; }
+        .main-content { width: 65%; padding: 40px; background: #fff; }
+        
+        .profile-img { width: 100%; aspect-ratio: 1; object-fit: cover; margin-bottom: 20px; box-shadow: 5px 5px 0px #333; filter: grayscale(100%); transition: 0.3s; }
+        .profile-img:hover { filter: none; }
+        
+        .name { font-family: 'Abril Fatface', serif; font-size: 38px; line-height: 1; margin-bottom: 20px; color: #333; }
+        
+        .contact-box { background: #fff; padding: 15px; margin-bottom: 30px; border: 2px solid #333; box-shadow: 4px 4px 0px #333; font-size: 14px; }
+        .contact-box div { margin-bottom: 5px; word-break: break-all; }
+        
+        h2 { font-family: 'Abril Fatface', serif; font-size: 20px; margin-bottom: 20px; color: #333; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .skill-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .skill-tag { background: #333; color: #fff; padding: 5px 10px; font-size: 13px; font-weight: 600; }
+        
+        .section-header { font-family: 'Abril Fatface', serif; font-size: 24px; color: #333; margin-bottom: 30px; border-bottom: 4px solid #ffde59; display: inline-block; padding-bottom: 5px; }
+        
+        .entry { margin-bottom: 30px; position: relative; }
+        .entry-title { font-weight: 700; font-size: 18px; margin-bottom: 2px; }
+        .entry-subtitle { font-weight: 600; font-size: 14px; color: #666; font-style: italic; }
+        .entry-date { font-size: 13px; color: #999; margin-bottom: 10px; font-weight: 600; }
+        .entry-desc { font-size: 14px; line-height: 1.6; }
+
+        @media print {
+            body { padding: 0; background: white; }
+            .resume-container { width: 100%; box-shadow: none; margin: 0; }
+            .sidebar { background: #ffde59 !important; -webkit-print-color-adjust: exact; }
+            .section-header { border-bottom-color: #ffde59 !important; -webkit-print-color-adjust: exact; }
+            .skill-tag { background: #333 !important; color: #fff !important; -webkit-print-color-adjust: exact; }
+            .profile-img { box-shadow: none; border: 1px solid #333; }
+            .contact-box { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="resume-container">
+    <div class="sidebar">
+        {% if resume.personal_detail.image %}
+        <img src="{{ resume.personal_detail.image.url }}" class="profile-img">
+        {% endif %}
+        
+        <div class="name">{{ resume.personal_detail.full_name }}</div>
+        
+        <div class="contact-box">
+            <div>{{ resume.personal_detail.email }}</div>
+            <div>{{ resume.personal_detail.phone }}</div>
+            <div>{{ resume.personal_detail.address }}</div>
+        </div>
+        
+        <h2>Links</h2>
+        <div class="contact-box">
+            {% if resume.personal_detail.linkedin_url %}
+            <div><a href="{{ resume.personal_detail.linkedin_url }}" style="color: #333;">LinkedIn</a></div>
+            {% endif %}
+            {% if resume.personal_detail.portfolio_url %}
+            <div><a href="{{ resume.personal_detail.portfolio_url }}" style="color: #333;">Portfolio</a></div>
+            {% endif %}
+        </div>
+        
+        <h2>Skills</h2>
+        <div class="skill-list">
+            {% for skill in resume.skills.all %}
+            <div class="skill-tag">{{ skill.name }}</div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="main-content">
+        {% if resume.personal_detail.summary %}
+        <div style="margin-bottom: 40px; font-size: 15px; line-height: 1.8; font-weight: 500;">
+            {{ resume.personal_detail.summary }}
+        </div>
+        {% endif %}
+        
+        <div>
+            <div class="section-header">Experience</div>
+            {% for exp in resume.experience.all %}
+            <div class="entry">
+                <div class="entry-title">{{ exp.position }}</div>
+                <div class="entry-subtitle">{{ exp.company }}</div>
+                <div class="entry-date">{{ exp.start_date }} - {% if exp.is_current %}Present{% else %}{{ exp.end_date }}{% endif %}</div>
+                <div class="entry-desc">{{ exp.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div>
+            <div class="section-header">Education</div>
+            {% for edu in resume.education.all %}
+            <div class="entry">
+                <div class="entry-title">{{ edu.degree }}</div>
+                <div class="entry-subtitle">{{ edu.institution }}</div>
+                <div class="entry-date">{{ edu.start_date }} - {% if edu.is_current %}Present{% else %}{{ edu.end_date }}{% endif %}</div>
+                <div class="entry-desc">{{ edu.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+        </div>
+
+        {% if resume.research.all %}
+        <div>
+            <div class="section-header">Research</div>
+            {% for res in resume.research.all %}
+            <div class="entry">
+                <div class="entry-title">{{ res.title }}</div>
+                <div class="entry-date">{{ res.date }}</div>
+                <div class="entry-desc">{{ res.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if resume.publications.all %}
+        <div>
+           <div class="section-header">Publications</div>
+            {% for pub in resume.publications.all %}
+            <div class="entry">
+                <div class="entry-title">{{ pub.title }}</div>
+                <div class="entry-subtitle">{{ pub.publisher }}</div>
+                 <div class="entry-date">{{ pub.date }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if resume.awards.all %}
+        <div>
+            <div class="section-header">Awards</div>
+            {% for award in resume.awards.all %}
+            <div class="entry">
+                <div class="entry-title">{{ award.title }}</div>
+                <div class="entry-subtitle">{{ award.issuer }}</div>
+                <div class="entry-date">{{ award.date }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

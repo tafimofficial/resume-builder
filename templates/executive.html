@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.personal_detail.full_name }} | {{ resume.get_doc_type_display }}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
+        
+        body { font-family: 'Roboto', sans-serif; background: #eef1f5; margin: 0; padding: 40px 0; color: #333; }
+        .resume-container { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; box-shadow: 0 5px 20px rgba(0,0,0,0.1); display: grid; grid-template-columns: 35% 65%; }
+        
+        .sidebar { background: #1a2a3a; color: white; padding: 40px 30px; display: flex; flex-direction: column; }
+        .main-content { padding: 40px; background: #fff; }
+        
+        .profile-img { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 5px solid rgba(255,255,255,0.1); margin-bottom: 30px; align-self: center; }
+        
+        .sidebar h2 { font-size: 18px; text-transform: uppercase; letter-spacing: 2px; border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-bottom: 20px; font-weight: 700; }
+        
+        .contact-item { margin-bottom: 15px; font-size: 14px; display: flex; align-items: center; gap: 10px; }
+        .contact-item a { color: #bdc3c7; text-decoration: none; word-break: break-all; }
+        
+        .skill-item { margin-bottom: 15px; }
+        .skill-name { font-size: 14px; font-weight: 500; margin-bottom: 5px; }
+        .progress-bg { background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden; }
+        .progress-fill { background: #3498db; height: 100%; border-radius: 3px; }
+        
+        h1 { font-size: 42px; margin: 0; font-weight: 900; text-transform: uppercase; color: #1a2a3a; line-height: 1; margin-bottom: 10px; }
+        .profession { font-size: 18px; color: #3498db; text-transform: uppercase; letter-spacing: 3px; font-weight: 500; margin-bottom: 30px; }
+        
+        .summary { font-size: 15px; line-height: 1.6; color: #555; margin-bottom: 40px; border-left: 4px solid #3498db; padding-left: 15px; }
+        
+        .section-title { font-size: 20px; font-weight: 700; color: #1a2a3a; text-transform: uppercase; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; }
+        .section-title::after { content: ''; flex-grow: 1; height: 2px; background: #ecf0f1; }
+        
+        .timeline-item { position: relative; padding-left: 20px; margin-bottom: 30px; border-left: 2px solid #ecf0f1; }
+        .timeline-dot { position: absolute; left: -6px; top: 5px; width: 10px; height: 10px; background: #3498db; border-radius: 50%; }
+        
+        .item-title { font-size: 18px; font-weight: 700; color: #1a2a3a; }
+        .item-period { font-size: 14px; color: #3498db; font-weight: 500; margin-bottom: 5px; }
+        .item-company { font-size: 15px; font-weight: 600; color: #7f8c8d; margin-bottom: 10px; }
+        .item-desc { font-size: 14px; line-height: 1.6; color: #666; }
+        
+        .award-item { background: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid #3498db; }
+
+        @media print {
+            body { padding: 0; background: white; -webkit-print-color-adjust: exact; }
+            .resume-container { box-shadow: none; width: 100%; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="resume-container">
+    <div class="sidebar">
+        {% if resume.personal_detail.image %}
+            <img src="{{ resume.personal_detail.image.url }}" alt="Profile" class="profile-img">
+        {% endif %}
+        
+        <h2>Contact</h2>
+        <div class="contact-item">{{ resume.personal_detail.phone }}</div>
+        <div class="contact-item">{{ resume.personal_detail.email }}</div>
+        <div class="contact-item">{{ resume.personal_detail.address }}</div>
+        {% if resume.personal_detail.linkedin_url %}
+        <div class="contact-item"><a href="{{ resume.personal_detail.linkedin_url }}">LinkedIn</a></div>
+        {% endif %}
+        {% if resume.personal_detail.portfolio_url %}
+        <div class="contact-item"><a href="{{ resume.personal_detail.portfolio_url }}">Portfolio</a></div>
+        {% endif %}
+        
+        <h2 style="margin-top: 40px;">Expertise</h2>
+        {% for skill in resume.skills.all %}
+        <div class="skill-item">
+            <div class="skill-name">{{ skill.name }}</div>
+            <div class="progress-bg">
+                <div class="progress-fill" style="width: {{ skill.proficiency }}%;"></div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="main-content">
+        <h1>{{ resume.personal_detail.full_name }}</h1>
+        <div class="profession">Professional Profile</div>
+        
+        {% if resume.personal_detail.summary %}
+        <div class="summary">
+            {{ resume.personal_detail.summary }}
+        </div>
+        {% endif %}
+        
+        <div class="section-title">Experience</div>
+        {% for exp in resume.experience.all %}
+        <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="item-title">{{ exp.position }}</div>
+            <div class="item-company">{{ exp.company }}</div>
+            <div class="item-period">{{ exp.start_date }} - {% if exp.is_current %}Present{% else %}{{ exp.end_date }}{% endif %}</div>
+            <div class="item-desc">{{ exp.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        
+        <div class="section-title">Education</div>
+        {% for edu in resume.education.all %}
+        <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="item-title">{{ edu.degree }}</div>
+            <div class="item-company">{{ edu.institution }}</div>
+            <div class="item-period">{{ edu.start_date }} - {% if edu.is_current %}Present{% else %}{{ edu.end_date }}{% endif %}</div>
+            <div class="item-desc">{{ edu.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+
+        {% if resume.research.all %}
+        <div class="section-title">Research</div>
+        {% for res in resume.research.all %}
+        <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="item-title">{{ res.title }}</div>
+            <div class="item-period">{{ res.date }}</div>
+            <div class="item-desc">{{ res.description|linebreaksbr }}</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if resume.publications.all %}
+        <div class="section-title">Publications</div>
+        {% for pub in resume.publications.all %}
+        <div class="timeline-item">
+            <div class="timeline-dot"></div>
+            <div class="item-title">{{ pub.title }}</div>
+            <div class="item-company">{{ pub.publisher }}</div>
+            <div class="item-period">{{ pub.date }}</div>
+             {% if pub.url %}<div class="item-desc"><a href="{{ pub.url }}">{{ pub.url }}</a></div>{% endif %}
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        {% if resume.awards.all %}
+        <div class="section-title">Honors & Awards</div>
+        {% for award in resume.awards.all %}
+        <div class="award-item">
+            <div class="item-title" style="font-size: 16px;">{{ award.title }}</div>
+            <div class="item-company">{{ award.issuer }} | {{ award.date }}</div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+</body>
+</html>

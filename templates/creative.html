@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ resume.user.first_name }}'s Resume</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@400;600&display=swap');
+        
+        body { font-family: 'Open Sans', sans-serif; background: #ffeaa7; padding: 40px 0; }
+        .resume-container { background: white; width: 210mm; min-height: 297mm; margin: 0 auto; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        
+        .header { background: #6c5ce7; color: white; padding: 40px; text-align: center; position: relative; }
+        .header::after { content: ''; position: absolute; bottom: -20px; left: 0; width: 100%; height: 40px; background: white; border-radius: 50% 50% 0 0; }
+        
+        h1 { font-family: 'Montserrat', sans-serif; font-size: 42px; margin: 0; font-weight: 700; letter-spacing: 2px; }
+        .contact-info { margin-top: 15px; font-weight: 600; opacity: 0.9; }
+        
+        .content-body { padding: 40px; display: flex; gap: 40px; }
+        .left-col { width: 35%; }
+        .right-col { width: 65%; }
+        
+        h2 { font-family: 'Montserrat', sans-serif; color: #6c5ce7; font-size: 20px; text-transform: uppercase; border-left: 5px solid #a29bfe; padding-left: 10px; margin-bottom: 25px; }
+        
+        .skill-item { margin-bottom: 15px; }
+        .skill-name { font-weight: 600; margin-bottom: 5px; }
+        .skill-dots { display: flex; gap: 5px; }
+        .dot { width: 12px; height: 12px; background: #dfe6e9; border-radius: 50%; }
+        .dot.active { background: #fd79a8; }
+        
+        .personal-info { font-size: 14px; margin-bottom: 30px; line-height: 1.8; }
+        .personal-info b { display: block; color: #2d3436; margin-top: 10px; }
+        
+        .exp-item, .edu-item { position: relative; padding-left: 20px; border-left: 2px solid #eee; margin-bottom: 30px; }
+        .exp-item::before, .edu-item::before { content: ''; position: absolute; left: -6px; top: 0; width: 10px; height: 10px; background: #00b894; border-radius: 50%; }
+        
+        .role { font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 18px; color: #2d3436; }
+        .company { color: #636e72; font-weight: 600; margin-bottom: 10px; font-size: 15px; }
+        .date { font-size: 13px; color: #b2bec3; margin-bottom: 5px; }
+        .desc { font-size: 14px; line-height: 1.6; color: #636e72; }
+
+        @media print {
+            body { padding: 0; background: white; }
+            .resume-container { box-shadow: none; width: 100%; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="resume-container">
+    <div class="header">
+        <h1>{{ resume.personal_detail.full_name }}</h1>
+        <div class="contact-info">
+            {{ resume.personal_detail.email }} • {{ resume.personal_detail.phone }}
+        </div>
+    </div>
+    
+    <div class="content-body">
+        <div class="left-col">
+            <h2>About Me</h2>
+            <div class="personal-info">
+                {{ resume.personal_detail.summary }}
+                
+                <b>Address</b>
+                {{ resume.personal_detail.address }}
+                
+                {% if resume.personal_detail.linkedin_url %}
+                <b>LinkedIn</b>
+                <a href="{{ resume.personal_detail.linkedin_url }}" style="color: #6c5ce7; text-decoration: none;">Profile</a>
+                {% endif %}
+                
+                {% if resume.personal_detail.portfolio_url %}
+                 <b>Portfolio</b>
+                <a href="{{ resume.personal_detail.portfolio_url }}" style="color: #6c5ce7; text-decoration: none;">Website</a>
+                {% endif %}
+            </div>
+            
+            <h2>Skills</h2>
+            {% for skill in resume.skills.all %}
+            <div class="skill-item">
+                <div class="skill-name">{{ skill.name }}</div>
+                <div class="skill-dots">
+                    <!-- Simple logic to show 5 dots based on percentage -->
+                    <div class="dot {% if skill.proficiency > 10 %}active{% endif %}"></div>
+                    <div class="dot {% if skill.proficiency > 30 %}active{% endif %}"></div>
+                    <div class="dot {% if skill.proficiency > 50 %}active{% endif %}"></div>
+                    <div class="dot {% if skill.proficiency > 70 %}active{% endif %}"></div>
+                    <div class="dot {% if skill.proficiency > 90 %}active{% endif %}"></div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="right-col">
+            <h2>Experience</h2>
+            {% for exp in resume.experience.all %}
+            <div class="exp-item">
+                <div class="role">{{ exp.position }}</div>
+                <div class="date">{{ exp.start_date }} - {% if exp.is_current %}Present{% else %}{{ exp.end_date }}{% endif %}</div>
+                <div class="company">{{ exp.company }}</div>
+                <div class="desc">{{ exp.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+            
+            <h2>Education</h2>
+            {% for edu in resume.education.all %}
+            <div class="edu-item">
+                <div class="role">{{ edu.degree }}</div>
+                <div class="date">{{ edu.start_date }} - {% if edu.is_current %}Present{% else %}{{ edu.end_date }}{% endif %}</div>
+                <div class="company">{{ edu.institution }}</div>
+                <div class="desc">{{ edu.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+
+            {% if resume.research.all %}
+            <h2>Research</h2>
+            {% for res in resume.research.all %}
+            <div class="edu-item">
+                <div class="role">{{ res.title }}</div>
+                <div class="date">{{ res.date }}</div>
+                <div class="desc">{{ res.description|linebreaksbr }}</div>
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if resume.publications.all %}
+            <h2>Publications</h2>
+            {% for pub in resume.publications.all %}
+            <div class="edu-item">
+                <div class="role">{{ pub.title }}</div>
+                <div class="date">{{ pub.date }}</div>
+                <div class="company">{{ pub.publisher }}</div>
+                {% if pub.url %}
+                <div class="desc"><a href="{{ pub.url }}" style="color: #6c5ce7;">{{ pub.url }}</a></div>
+                {% endif %}
+            </div>
+            {% endfor %}
+            {% endif %}
+
+            {% if resume.awards.all %}
+            <h2>Awards & Honors</h2>
+            {% for award in resume.awards.all %}
+            <div class="edu-item">
+                <div class="role">{{ award.title }}</div>
+                <div class="date">{{ award.date }}</div>
+                <div class="company">{{ award.issuer }}</div>
+            </div>
+            {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

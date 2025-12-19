@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row align-items-center hero-section">
+    <div class="col-lg-6 text-start">
+        <h1 class="hero-title">Build Your Professional Career in Minutes</h1>
+        <p class="lead mb-4">Professional, attractive, and ATS-friendly resumes and CVs generated instantly. Stand out from the crowd.</p>
+        <div class="d-flex gap-3">
+            <a href="{% url 'create_resume' %}?type=resume" class="btn btn-primary btn-lg px-4 py-3 rounded-pill fw-bold text-white">
+                <i class="bi bi-file-earmark-person"></i> Create Resume
+            </a>
+            <a href="{% url 'create_resume' %}?type=cv" class="btn btn-outline-light btn-lg px-4 py-3 rounded-pill fw-bold">
+                <i class="bi bi-file-earmark-text"></i> Create CV
+            </a>
+        </div>
+    </div>
+    <div class="col-lg-6">
+        <!-- Placeholder for a nice hero image or illustration -->
+        <div class="glass-card p-4">
+             <div class="row g-2">
+                 <div class="col-6"><div style="height: 150px; background: #ddd; border-radius: 8px;"></div></div>
+                 <div class="col-6"><div style="height: 150px; background: #ccc; border-radius: 8px;"></div></div>
+                 <div class="col-12"><div style="height: 200px; background: #eee; border-radius: 8px;"></div></div>
+             </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-5 text-center">
+    <div class="col-md-4 mb-4">
+        <div class="glass-card p-4 feature-card">
+            <h3>Easy to Use</h3>
+            <p>Fill in your details, choose a template, and download. It's that simple.</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="glass-card p-4 feature-card">
+            <h3>Professional Designs</h3>
+            <p>Templates designed by HR professionals to get you hired.</p>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="glass-card p-4 feature-card">
+            <h3>Completely Free</h3>
+            <p>Build as many resumes as you want without any hidden costs.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
